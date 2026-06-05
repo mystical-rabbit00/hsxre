@@ -6,8 +6,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Servidor Roblox Thumbnail API online.");
+});
+
+app.get("/thumbnails", (req, res) => {
+  res.send("Rota thumbnails online");
+});
+
 app.post("/thumbnails", async (req, res) => {
+
   try {
+
     const { assetIds } = req.body;
 
     const robloxUrl =
@@ -17,16 +27,19 @@ app.post("/thumbnails", async (req, res) => {
     const data = await response.json();
 
     res.json(data);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
+
 });
 
 const PORT = process.env.PORT || 3000;
-app.get("/", (req, res) => {
-  res.send("Servidor Roblox Thumbnail API online.");
-});
 
 app.listen(PORT, () => {
-  console.log("Servidor online na porta " + PORT);
+  console.log("Servidor online");
 });
