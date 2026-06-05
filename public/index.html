@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Roblox Thumbnail Extractor</title>
+<style>
+body{font-family:Arial;max-width:1200px;margin:auto;padding:20px}
+textarea{width:100%;height:250px}
+button{padding:10px 20px;margin-top:10px}
+#results{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;margin-top:20px}
+.card{border:1px solid #ddd;padding:10px}
+.card img{width:100%}
+</style>
+</head>
+<body>
+
+<h1>Roblox Thumbnail Extractor</h1>
+
+<p>Troque API_URL pela URL do seu Render.</p>
+
+<textarea id="links" placeholder="Cole os links da Creator Store"></textarea>
+<br>
+<button onclick="buscar()">Buscar Imagens</button>
+
+<div id="results"></div>
+
+<script>
+const API_URL = "https://SEU-APP.onrender.com/thumbnails";
+
+async function buscar() {
+  const area = document.getElementById("links");
+  const results = document.getElementById("results");
+
+  const assetIds = area.value
+    .split("\n")
+    .map(x => x.trim())
+    .filter(Boolean)
+    .map(link => {
+      const m = link.match(/asset\/(\d+)/i);
+      return m ? m[1] : null;
+    })
+    .filter(Boolean);
+
+  if (!assetIds.length) {
+    results.innerHTML = "<p>Nenhum Asset ID encontrado.</p>";
+    return;
+  }
+
+  results.innerHTML = "<p>Buscando...</p>";
+
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ assetIds })
+  });
+
+  const json = await response.json();
+
+  results.innerHTML = "";
+
+  for (const item of json.data || []) {
+    results.innerHTML += `
+      <div class="card">
+        <img src="${item.imageUrl}" />
+        <p>Asset ID: ${item.targetId}</p>
+        <a href="${item.imageUrl}" target="_blank">Abrir imagem</a>
+      </div>
+    `;
+  }
+}
+</script>
+
+</body>
+</html>
